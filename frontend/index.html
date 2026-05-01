@@ -11,6 +11,18 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loader">
+            <i class="fa-solid fa-hands-holding-child fa-bounce"></i>
+            <h2>HopeCare</h2>
+            <p>Loading Dashboard...</p>
+            <div class="progress-bar-container">
+                <div class="progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar">
@@ -50,12 +62,14 @@
                     <i class="fa-solid fa-search"></i>
                     <input type="text" placeholder="Search records...">
                 </div>
-                <div class="user-profile">
-                    <div class="notification-icon">
-                        <i class="fa-regular fa-bell"></i>
-                        <span class="badge">3</span>
+                <div class="right-header">
+                    <div class="datetime-display" id="datetime-display">
+                        <div class="time" id="current-time">--:--</div>
+                        <div class="date" id="current-date">---</div>
                     </div>
-                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=6366f1&color=fff" alt="Admin Avatar" class="avatar">
+                    <div class="user-profile">
+                        <img src="https://ui-avatars.com/api/?name=HT&background=6366f1&color=fff" alt="User Avatar" class="avatar">
+                    </div>
                 </div>
             </header>
 

@@ -3,6 +3,17 @@
 const API_BASE_URL = 'http://localhost:3000/api';
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Loading Screen logic (2 seconds)
+    setTimeout(() => {
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) {
+            loadingScreen.classList.add('hidden');
+        }
+    }, 2000);
+
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+
     initNavigation();
     loadDashboardData();
     loadChildrenData();
@@ -268,4 +279,14 @@ async function loadAllocationsData() {
     } catch (error) {
         console.error('Error loading allocations data:', error);
     }
+}
+
+function updateDateTime() {
+    const timeEl = document.getElementById('current-time');
+    const dateEl = document.getElementById('current-date');
+    if(!timeEl || !dateEl) return;
+
+    const now = new Date();
+    timeEl.textContent = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    dateEl.textContent = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 }
