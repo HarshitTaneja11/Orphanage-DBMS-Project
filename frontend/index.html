@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HopeCare - Orphanage Management Dashboard</title>
+    <meta name="description" content="Orphanage management system frontend dashboard">
+    <link rel="stylesheet" href="index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <i class="fa-solid fa-hands-holding-child"></i>
+                <h1>HopeCare</h1>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-target="dashboard">
+                    <i class="fa-solid fa-chart-pie"></i> Dashboard
+                </a>
+                <a href="#" class="nav-item" data-target="children">
+                    <i class="fa-solid fa-children"></i> Children
+                </a>
+                <a href="#" class="nav-item" data-target="staff">
+                    <i class="fa-solid fa-users-gear"></i> Staff
+                </a>
+                <a href="#" class="nav-item" data-target="donors">
+                    <i class="fa-solid fa-hand-holding-dollar"></i> Donors
+                </a>
+                <a href="#" class="nav-item" data-target="donations">
+                    <i class="fa-solid fa-sack-dollar"></i> Donations
+                </a>
+                <a href="#" class="nav-item" data-target="resources">
+                    <i class="fa-solid fa-box-open"></i> Resources
+                </a>
+                <a href="#" class="nav-item" data-target="allocations">
+                    <i class="fa-solid fa-clipboard-list"></i> Allocations
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="search-bar">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" placeholder="Search records...">
+                </div>
+                <div class="user-profile">
+                    <div class="notification-icon">
+                        <i class="fa-regular fa-bell"></i>
+                        <span class="badge">3</span>
+                    </div>
+                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=6366f1&color=fff" alt="Admin Avatar" class="avatar">
+                </div>
+            </header>
+
+            <div class="content-area">
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="page-section active">
+                    <h2 class="section-title">Overview</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(99, 102, 241, 0.2); color: #818cf8;">
+                                <i class="fa-solid fa-children"></i>
+                            </div>
+                            <div class="stat-details">
+                                <h3>Total Children</h3>
+                                <p class="stat-value">124</p>
+                                <span class="stat-trend positive"><i class="fa-solid fa-arrow-trend-up"></i> +4 this month</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(34, 197, 94, 0.2); color: #4ade80;">
+                                <i class="fa-solid fa-hand-holding-dollar"></i>
+                            </div>
+                            <div class="stat-details">
+                                <h3>Total Donations</h3>
+                                <p class="stat-value">₹255,000</p>
+                                <span class="stat-trend positive"><i class="fa-solid fa-arrow-trend-up"></i> +12% vs last month</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;">
+                                <i class="fa-solid fa-box-open"></i>
+                            </div>
+                            <div class="stat-details">
+                                <h3>Resources Available</h3>
+                                <p class="stat-value">470</p>
+                                <span class="stat-trend negative"><i class="fa-solid fa-arrow-trend-down"></i> -15 this week</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(236, 72, 153, 0.2); color: #f472b6;">
+                                <i class="fa-solid fa-clipboard-list"></i>
+                            </div>
+                            <div class="stat-details">
+                                <h3>Allocations Today</h3>
+                                <p class="stat-value">12</p>
+                                <span class="stat-trend neutral"><i class="fa-solid fa-minus"></i> Same as yesterday</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-charts">
+                        <div class="chart-container glass-panel">
+                            <h3>Recent Donations</h3>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Donor</th>
+                                        <th>Amount</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-donations-body">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="chart-container glass-panel">
+                            <h3>Low Resources Alert</h3>
+                            <ul class="resource-list" id="low-resources-list">
+                                <!-- Populated by JS -->
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Children Section -->
+                <section id="children" class="page-section hidden">
+                    <div class="section-header">
+                        <h2 class="section-title">Children Records</h2>
+                        <button class="btn-primary"><i class="fa-solid fa-plus"></i> Add Child</button>
+                    </div>
+                    <div class="glass-panel">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>DOB</th>
+                                    <th>Gender</th>
+                                    <th>Medical Info</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="children-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Resource Section -->
+                <section id="resources" class="page-section hidden">
+                    <div class="section-header">
+                        <h2 class="section-title">Resource Inventory</h2>
+                        <button class="btn-primary"><i class="fa-solid fa-plus"></i> Add Resource</button>
+                    </div>
+                    <div class="glass-panel">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Resource Type</th>
+                                    <th>Total Quantity</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resources-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                
+                <!-- Staff Section -->
+                <section id="staff" class="page-section hidden">
+                    <div class="section-header">
+                        <h2 class="section-title">Staff Management</h2>
+                        <button class="btn-primary"><i class="fa-solid fa-plus"></i> Add Staff</button>
+                    </div>
+                    <div class="glass-panel">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Contact</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="staff-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                
+                <!-- Donors Section -->
+                <section id="donors" class="page-section hidden">
+                    <div class="section-header">
+                        <h2 class="section-title">Donor Records</h2>
+                        <button class="btn-primary"><i class="fa-solid fa-plus"></i> Add Donor</button>
+                    </div>
+                    <div class="glass-panel">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Contact</th>
+                                    <th>Email</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="donors-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                
+                <!-- Donations Section -->
+                <section id="donations" class="page-section hidden">
+                    <div class="section-header">
+                        <h2 class="section-title">Donation History</h2>
+                        <button class="btn-primary"><i class="fa-solid fa-plus"></i> Record Donation</button>
+                    </div>
+                    <div class="glass-panel">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Donor Name</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="donations-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                
+                <!-- Allocations Section -->
+                <section id="allocations" class="page-section hidden">
+                    <div class="section-header">
+                        <h2 class="section-title">Resource Allocations</h2>
+                        <button class="btn-primary"><i class="fa-solid fa-plus"></i> New Allocation</button>
+                    </div>
+                    <div class="glass-panel">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Child</th>
+                                    <th>Resource</th>
+                                    <th>Quantity</th>
+                                    <th>Date</th>
+                                    <th>Staff</th>
+                                </tr>
+                            </thead>
+                            <tbody id="allocations-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
