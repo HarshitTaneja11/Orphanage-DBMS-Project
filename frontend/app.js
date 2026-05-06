@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadDonorsData();
     loadDonationsData();
     loadAllocationsData();
+    initModals();
 });
 
 function initNavigation() {
@@ -128,12 +129,16 @@ async function loadChildrenData() {
                         <td>${child.medical}</td>
                         <td>
                             <div class="action-btns">
-                                <button class="btn-icon" title="Edit"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn-icon delete" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                <button class="btn-icon" title="Edit" onclick='openEditModal("child-modal", "child-form", {id: ${child.id}, name: ${JSON.stringify(child.name)}, dob: "${child.dob}", gender: "${child.gender}", medical: ${JSON.stringify(child.medical || "")}})'><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn-icon delete" title="Delete" onclick="handleDelete('/children', ${child.id}, loadChildrenData)"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </td>
                     </tr>
                 `).join('');
+            }
+            const childSelect = document.getElementById('allocation-child-select');
+            if (childSelect) {
+                childSelect.innerHTML = '<option value="">Select a Child</option>' + children.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
             }
         }
     } catch (error) {
@@ -160,12 +165,16 @@ async function loadResourcesData() {
                         </td>
                         <td>
                             <div class="action-btns">
-                                <button class="btn-icon" title="Edit"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn-icon delete" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                <button class="btn-icon" title="Edit" onclick='openEditModal("resource-modal", "resource-form", {id: ${res.id}, type: ${JSON.stringify(res.type)}, qty: ${res.qty}})'><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn-icon delete" title="Delete" onclick="handleDelete('/resources', ${res.id}, loadResourcesData)"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </td>
                     </tr>
                 `).join('');
+            }
+            const resourceSelect = document.getElementById('allocation-resource-select');
+            if (resourceSelect) {
+                resourceSelect.innerHTML = '<option value="">Select a Resource</option>' + resources.map(r => `<option value="${r.id}">${r.type}</option>`).join('');
             }
         }
     } catch (error) {
@@ -193,12 +202,16 @@ async function loadStaffData() {
                         <td>${s.contact}</td>
                         <td>
                             <div class="action-btns">
-                                <button class="btn-icon" title="Edit"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn-icon delete" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                <button class="btn-icon" title="Edit" onclick='openEditModal("staff-modal", "staff-form", {id: ${s.id}, name: ${JSON.stringify(s.name)}, role: ${JSON.stringify(s.role)}, contact: ${JSON.stringify(s.contact)}})'><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn-icon delete" title="Delete" onclick="handleDelete('/staff', ${s.id}, loadStaffData)"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </td>
                     </tr>
                 `).join('');
+            }
+            const staffSelect = document.getElementById('allocation-staff-select');
+            if (staffSelect) {
+                staffSelect.innerHTML = '<option value="">Select Staff</option>' + staff.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
             }
         }
     } catch (error) {
@@ -221,12 +234,16 @@ async function loadDonorsData() {
                         <td>${d.email || 'N/A'}</td>
                         <td>
                             <div class="action-btns">
-                                <button class="btn-icon" title="Edit"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn-icon delete" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                <button class="btn-icon" title="Edit" onclick='openEditModal("donor-modal", "donor-form", {id: ${d.id}, name: ${JSON.stringify(d.name)}, contact: ${JSON.stringify(d.contact || "")}, email: ${JSON.stringify(d.email || "")}})'><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn-icon delete" title="Delete" onclick="handleDelete('/donors', ${d.id}, loadDonorsData)"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </td>
                     </tr>
                 `).join('');
+            }
+            const donorSelect = document.getElementById('donation-donor-select');
+            if (donorSelect) {
+                donorSelect.innerHTML = '<option value="">Select a Donor</option>' + donors.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
             }
         }
     } catch (error) {
@@ -272,6 +289,12 @@ async function loadAllocationsData() {
                         <td>${a.qty}</td>
                         <td>${a.date}</td>
                         <td>${a.staff}</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn-icon" title="Edit" onclick='openEditModal("allocation-modal", "allocation-form", {id: ${a.id}, child_id: ${a.child_id}, resource_id: ${a.resource_id}, qty: ${a.qty}, staff_id: ${a.staff_id}})'><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn-icon delete" title="Delete" onclick="handleDelete('/allocations', ${a.id}, loadAllocationsData)"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>
                     </tr>
                 `).join('');
             }
@@ -279,6 +302,139 @@ async function loadAllocationsData() {
     } catch (error) {
         console.error('Error loading allocations data:', error);
     }
+}
+
+function initModals() {
+    const modalMap = {
+        'btn-add-child': 'child-modal',
+        'btn-add-resource': 'resource-modal',
+        'btn-add-staff': 'staff-modal',
+        'btn-add-donor': 'donor-modal',
+        'btn-record-donation': 'donation-modal',
+        'btn-new-allocation': 'allocation-modal'
+    };
+
+    // Open Modals
+    for (const [btnId, modalId] of Object.entries(modalMap)) {
+        const btn = document.getElementById(btnId);
+        const modal = document.getElementById(modalId);
+        if (btn && modal) {
+            btn.addEventListener('click', () => {
+                modal.classList.add('active');
+            });
+        }
+    }
+
+    // Close Modals
+    document.querySelectorAll('.close-btn, .close-modal').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const overlay = e.target.closest('.modal-overlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+                const form = overlay.querySelector('form');
+                if(form) {
+                    form.reset();
+                    const idInput = form.querySelector('input[name="id"]');
+                    if(idInput) idInput.remove();
+                }
+            }
+        });
+    });
+
+    // Form Submissions
+    setupFormSubmit('child-form', '/children', loadChildrenData);
+    setupFormSubmit('resource-form', '/resources', loadResourcesData);
+    setupFormSubmit('staff-form', '/staff', loadStaffData);
+    setupFormSubmit('donor-form', '/donors', loadDonorsData);
+    setupFormSubmit('donation-form', '/donations', loadDonationsData);
+    setupFormSubmit('allocation-form', '/allocations', loadAllocationsData);
+}
+
+function setupFormSubmit(formId, endpoint, reloadCallback) {
+    const form = document.getElementById(formId);
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        
+        const isEdit = !!data.id;
+        const method = isEdit ? 'PUT' : 'POST';
+        const url = isEdit ? `${API_BASE_URL}${endpoint}/${data.id}` : `${API_BASE_URL}${endpoint}`;
+
+        try {
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                const modal = form.closest('.modal-overlay');
+                if (modal) modal.classList.remove('active');
+                form.reset();
+                if(form.querySelector('input[name="id"]')) {
+                    form.querySelector('input[name="id"]').remove();
+                }
+                reloadCallback();
+                loadDashboardData(); // Refresh dashboard stats
+            } else {
+                const resData = await response.json();
+                alert('Error: ' + (resData.error || 'Failed to save data'));
+            }
+        } catch (err) {
+            console.error('Error submitting form:', err);
+            alert('Network error. Failed to save data.');
+        }
+    });
+}
+
+async function handleDelete(endpoint, id, reloadCallback) {
+    if (!confirm('Are you sure you want to delete this record?')) return;
+    try {
+        const res = await fetch(`${API_BASE_URL}${endpoint}/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+            reloadCallback();
+            loadDashboardData();
+        } else {
+            const data = await res.json();
+            alert('Cannot delete: ' + (data.error || 'Foreign key constraint or unknown error'));
+        }
+    } catch (err) {
+        console.error(err);
+        alert('Network error during deletion');
+    }
+}
+
+function openEditModal(modalId, formId, data) {
+    const modal = document.getElementById(modalId);
+    const form = document.getElementById(formId);
+    if (!modal || !form) return;
+    
+    // Reset form
+    form.reset();
+    
+    // Set fields
+    Object.keys(data).forEach(key => {
+        const input = form.elements[key];
+        if (input) input.value = data[key];
+    });
+    
+    // Add hidden ID field
+    let idInput = form.querySelector('input[name="id"]');
+    if (!idInput) {
+        idInput = document.createElement('input');
+        idInput.type = 'hidden';
+        idInput.name = 'id';
+        form.appendChild(idInput);
+    }
+    idInput.value = data.id;
+    
+    modal.classList.add('active');
 }
 
 function updateDateTime() {

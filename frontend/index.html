@@ -6,7 +6,6 @@
     <title>HopeCare - Orphanage Management Dashboard</title>
     <meta name="description" content="Orphanage management system frontend dashboard">
     <link rel="stylesheet" href="index.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -52,16 +51,15 @@
                 <a href="#" class="nav-item" data-target="allocations">
                     <i class="fa-solid fa-clipboard-list"></i> Allocations
                 </a>
+                <a href="#" class="nav-item" data-target="about">
+                    <i class="fa-solid fa-circle-info"></i> About Project
+                </a>
             </nav>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
             <header class="top-bar">
-                <div class="search-bar">
-                    <i class="fa-solid fa-search"></i>
-                    <input type="text" placeholder="Search records...">
-                </div>
                 <div class="right-header">
                     <div class="datetime-display" id="datetime-display">
                         <div class="time" id="current-time">--:--</div>
@@ -150,7 +148,7 @@
                 <section id="children" class="page-section hidden">
                     <div class="section-header">
                         <h2 class="section-title">Children Records</h2>
-                        <button class="btn-primary"><i class="fa-solid fa-plus"></i> Add Child</button>
+                        <button class="btn-primary" id="btn-add-child"><i class="fa-solid fa-plus"></i> Add Child</button>
                     </div>
                     <div class="glass-panel">
                         <table class="data-table">
@@ -175,7 +173,7 @@
                 <section id="resources" class="page-section hidden">
                     <div class="section-header">
                         <h2 class="section-title">Resource Inventory</h2>
-                        <button class="btn-primary"><i class="fa-solid fa-plus"></i> Add Resource</button>
+                        <button class="btn-primary" id="btn-add-resource"><i class="fa-solid fa-plus"></i> Add Resource</button>
                     </div>
                     <div class="glass-panel">
                         <table class="data-table">
@@ -199,7 +197,7 @@
                 <section id="staff" class="page-section hidden">
                     <div class="section-header">
                         <h2 class="section-title">Staff Management</h2>
-                        <button class="btn-primary"><i class="fa-solid fa-plus"></i> Add Staff</button>
+                        <button class="btn-primary" id="btn-add-staff"><i class="fa-solid fa-plus"></i> Add Staff</button>
                     </div>
                     <div class="glass-panel">
                         <table class="data-table">
@@ -223,7 +221,7 @@
                 <section id="donors" class="page-section hidden">
                     <div class="section-header">
                         <h2 class="section-title">Donor Records</h2>
-                        <button class="btn-primary"><i class="fa-solid fa-plus"></i> Add Donor</button>
+                        <button class="btn-primary" id="btn-add-donor"><i class="fa-solid fa-plus"></i> Add Donor</button>
                     </div>
                     <div class="glass-panel">
                         <table class="data-table">
@@ -247,7 +245,7 @@
                 <section id="donations" class="page-section hidden">
                     <div class="section-header">
                         <h2 class="section-title">Donation History</h2>
-                        <button class="btn-primary"><i class="fa-solid fa-plus"></i> Record Donation</button>
+                        <button class="btn-primary" id="btn-record-donation"><i class="fa-solid fa-plus"></i> Record Donation</button>
                     </div>
                     <div class="glass-panel">
                         <table class="data-table">
@@ -271,7 +269,7 @@
                 <section id="allocations" class="page-section hidden">
                     <div class="section-header">
                         <h2 class="section-title">Resource Allocations</h2>
-                        <button class="btn-primary"><i class="fa-solid fa-plus"></i> New Allocation</button>
+                        <button class="btn-primary" id="btn-new-allocation"><i class="fa-solid fa-plus"></i> New Allocation</button>
                     </div>
                     <div class="glass-panel">
                         <table class="data-table">
@@ -283,6 +281,7 @@
                                     <th>Quantity</th>
                                     <th>Date</th>
                                     <th>Staff</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="allocations-body">
@@ -292,9 +291,296 @@
                     </div>
                 </section>
 
+                <!-- About Section -->
+                <section id="about" class="page-section hidden">
+                    <div class="section-header">
+                        <h2 class="section-title">About the Project</h2>
+                    </div>
+                    <div class="glass-panel about-container" style="padding: 32px;">
+                        <div class="about-header" style="text-align: center; margin-bottom: 40px;">
+                            <h1 style="font-size: 32px; color: var(--accent-color); margin-bottom: 12px;">Secure Orphanage Resource Management System (SORMS)</h1>
+                            <p style="font-size: 18px; color: var(--text-secondary); font-style: italic;">"Technology-driven transparency and efficiency in orphanage management."</p>
+                        </div>
+                        
+                        <div class="about-description" style="margin-bottom: 40px; line-height: 1.6; font-size: 16px;">
+                            <p>A full-stack orphanage management system designed to securely manage child welfare records, donations, resource inventory, and allocation tracking. The system integrates a normalized MySQL database with a Python/Flask backend and a responsive frontend dashboard, ensuring efficient operations, transparency, and accountability through automation, audit logging, and role-based access control.</p>
+                        </div>
+
+                        <div class="about-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 40px;">
+                            
+                            <!-- Tech Stack Card -->
+                            <div class="about-card" style="background: rgba(255,255,255,0.5); border-radius: 12px; padding: 24px; border: 1px solid var(--surface-border);">
+                                <h3 style="margin-bottom: 16px; color: var(--accent-color); display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-code"></i> Tech Stack</h3>
+                                <div style="margin-bottom: 12px;">
+                                    <strong>Frontend:</strong>
+                                    <div class="tag-container" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
+                                        <span class="tech-tag">HTML5</span><span class="tech-tag">CSS3</span><span class="tech-tag">JavaScript</span>
+                                    </div>
+                                </div>
+                                <div style="margin-bottom: 12px;">
+                                    <strong>Backend:</strong>
+                                    <div class="tag-container" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
+                                        <span class="tech-tag">Python</span><span class="tech-tag">Flask</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <strong>Database:</strong>
+                                    <div class="tag-container" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
+                                        <span class="tech-tag">MySQL</span><span class="tech-tag">MySQL Workbench</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Core DBMS Features Card -->
+                            <div class="about-card" style="background: rgba(255,255,255,0.5); border-radius: 12px; padding: 24px; border: 1px solid var(--surface-border);">
+                                <h3 style="margin-bottom: 16px; color: var(--accent-color); display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-database"></i> Core DBMS Features</h3>
+                                <ul style="list-style-type: none; padding-left: 0; display: flex; flex-direction: column; gap: 8px;">
+                                    <li><i class="fa-solid fa-check" style="color: var(--success); margin-right: 8px;"></i> Normalization up to BCNF</li>
+                                    <li><i class="fa-solid fa-check" style="color: var(--success); margin-right: 8px;"></i> Stored Procedures & Functions</li>
+                                    <li><i class="fa-solid fa-check" style="color: var(--success); margin-right: 8px;"></i> Triggers & Views</li>
+                                    <li><i class="fa-solid fa-check" style="color: var(--success); margin-right: 8px;"></i> Transactions (Rollback/Commit)</li>
+                                    <li><i class="fa-solid fa-check" style="color: var(--success); margin-right: 8px;"></i> Role-Based Access Control</li>
+                                    <li><i class="fa-solid fa-check" style="color: var(--success); margin-right: 8px;"></i> Indexing & Audit Logging</li>
+                                </ul>
+                            </div>
+
+                            <!-- Key Features Card -->
+                            <div class="about-card" style="background: rgba(255,255,255,0.5); border-radius: 12px; padding: 24px; border: 1px solid var(--surface-border);">
+                                <h3 style="margin-bottom: 16px; color: var(--accent-color); display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-star"></i> Key Features</h3>
+                                <ul style="list-style-type: none; padding-left: 0; display: flex; flex-direction: column; gap: 8px;">
+                                    <li><i class="fa-solid fa-circle-dot" style="color: var(--accent-color); font-size: 10px; margin-right: 8px;"></i> Child record management</li>
+                                    <li><i class="fa-solid fa-circle-dot" style="color: var(--accent-color); font-size: 10px; margin-right: 8px;"></i> Donation tracking</li>
+                                    <li><i class="fa-solid fa-circle-dot" style="color: var(--accent-color); font-size: 10px; margin-right: 8px;"></i> Resource inventory management</li>
+                                    <li><i class="fa-solid fa-circle-dot" style="color: var(--accent-color); font-size: 10px; margin-right: 8px;"></i> Automated resource allocation</li>
+                                    <li><i class="fa-solid fa-circle-dot" style="color: var(--accent-color); font-size: 10px; margin-right: 8px;"></i> Live dashboard statistics</li>
+                                    <li><i class="fa-solid fa-circle-dot" style="color: var(--accent-color); font-size: 10px; margin-right: 8px;"></i> Transaction logging via triggers</li>
+                                    <li><i class="fa-solid fa-circle-dot" style="color: var(--accent-color); font-size: 10px; margin-right: 8px;"></i> Role-based access permissions</li>
+                                    <li><i class="fa-solid fa-circle-dot" style="color: var(--accent-color); font-size: 10px; margin-right: 8px;"></i> Search & reporting system</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Team Members -->
+                        <div class="team-section" style="text-align: center;">
+                            <h3 style="margin-bottom: 24px; color: var(--text-primary); font-size: 22px;">Team Members</h3>
+                            <div style="display: flex; justify-content: center; gap: 24px; flex-wrap: wrap;">
+                                <div class="team-member" style="background: rgba(255,255,255,0.7); padding: 16px 32px; border-radius: 50px; border: 1px solid var(--surface-border); display: flex; flex-direction: column; align-items: center; gap: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                                    <strong style="font-size: 16px;">Icy Agarwal</strong>
+                                    <span style="font-size: 14px; color: var(--text-secondary);">1024030823</span>
+                                </div>
+                                <div class="team-member" style="background: rgba(255,255,255,0.7); padding: 16px 32px; border-radius: 50px; border: 1px solid var(--surface-border); display: flex; flex-direction: column; align-items: center; gap: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                                    <strong style="font-size: 16px;">Harshit Taneja</strong>
+                                    <span style="font-size: 14px; color: var(--text-secondary);">1024030826</span>
+                                </div>
+                                <div class="team-member" style="background: rgba(255,255,255,0.7); padding: 16px 32px; border-radius: 50px; border: 1px solid var(--surface-border); display: flex; flex-direction: column; align-items: center; gap: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                                    <strong style="font-size: 16px;">Riddhi Dhawan</strong>
+                                    <span style="font-size: 14px; color: var(--text-secondary);">1024030943</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
             </div>
         </main>
     </div>
+    <!-- Modals -->
+    <!-- Child Modal -->
+    <div class="modal-overlay" id="child-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Add New Child</h3>
+                <button class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="child-form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Date of Birth</label>
+                        <input type="date" name="dob" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <select name="gender" class="form-control" required>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Medical Record</label>
+                        <input type="text" name="medical" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary close-modal">Cancel</button>
+                    <button type="submit" class="btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Resource Modal -->
+    <div class="modal-overlay" id="resource-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Add Resource</h3>
+                <button class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="resource-form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Resource Type</label>
+                        <input type="text" name="type" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Total Quantity</label>
+                        <input type="number" name="qty" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary close-modal">Cancel</button>
+                    <button type="submit" class="btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Staff Modal -->
+    <div class="modal-overlay" id="staff-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Add Staff</h3>
+                <button class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="staff-form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Role</label>
+                        <input type="text" name="role" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contact</label>
+                        <input type="text" name="contact" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary close-modal">Cancel</button>
+                    <button type="submit" class="btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Donor Modal -->
+    <div class="modal-overlay" id="donor-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Add Donor</h3>
+                <button class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="donor-form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contact</label>
+                        <input type="text" name="contact" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary close-modal">Cancel</button>
+                    <button type="submit" class="btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Donation Modal -->
+    <div class="modal-overlay" id="donation-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Record Donation</h3>
+                <button class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="donation-form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Donor</label>
+                        <select name="donor_id" id="donation-donor-select" class="form-control" required>
+                            <option value="">Select a Donor</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Amount</label>
+                        <input type="number" name="amount" class="form-control" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" name="date" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary close-modal">Cancel</button>
+                    <button type="submit" class="btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Allocation Modal -->
+    <div class="modal-overlay" id="allocation-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>New Allocation</h3>
+                <button class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="allocation-form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Child</label>
+                        <select name="child_id" id="allocation-child-select" class="form-control" required>
+                            <option value="">Select a Child</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Resource</label>
+                        <select name="resource_id" id="allocation-resource-select" class="form-control" required>
+                            <option value="">Select a Resource</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" name="qty" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Staff (Allocated By)</label>
+                        <select name="staff_id" id="allocation-staff-select" class="form-control" required>
+                            <option value="">Select Staff</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary close-modal">Cancel</button>
+                    <button type="submit" class="btn-primary">Allocate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>

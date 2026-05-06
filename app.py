@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 import mysql.connector
 import os
@@ -186,7 +186,7 @@ def get_allocations():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         query = """
-            SELECT a.Allocation_ID as id, c.Name as child, r.Resource_Type as resource, a.Quantity as qty, DATE_FORMAT(a.Allocation_Date, '%Y-%m-%d') as date, s.Name as staff 
+            SELECT a.Allocation_ID as id, a.Child_ID as child_id, a.Resource_ID as resource_id, a.Staff_ID as staff_id, c.Name as child, r.Resource_Type as resource, a.Quantity as qty, DATE_FORMAT(a.Allocation_Date, '%Y-%m-%d') as date, s.Name as staff 
             FROM Allocation a 
             JOIN Children c ON a.Child_ID = c.Child_ID 
             JOIN Resource r ON a.Resource_ID = r.Resource_ID
@@ -197,6 +197,240 @@ def get_allocations():
         rows = cursor.fetchall()
         return jsonify(rows)
     except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/children', methods=['POST'])
+def add_child():
+    data = request.json
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('INSERT INTO Children (Name, DOB, Gender, Medical_Record) VALUES (%s, %s, %s, %s)',
+                       (data['name'], data['dob'], data['gender'], data.get('medical', '')))
+        conn.commit()
+        return jsonify({'success': True, 'id': cursor.lastrowid})
+    except Exception as e:
+        if conn: conn.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/resources', methods=['POST'])
+def add_resource():
+    data = request.json
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('INSERT INTO Resource (Resource_Type, Total_Quantity) VALUES (%s, %s)',
+                       (data['type'], data['qty']))
+        conn.commit()
+        return jsonify({'success': True, 'id': cursor.lastrowid})
+    except Exception as e:
+        if conn: conn.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/staff', methods=['POST'])
+def add_staff():
+    data = request.json
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('INSERT INTO Staff (Name, Role, Contact) VALUES (%s, %s, %s)',
+                       (data['name'], data['role'], data['contact']))
+        conn.commit()
+        return jsonify({'success': True, 'id': cursor.lastrowid})
+    except Exception as e:
+        if conn: conn.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/donors', methods=['POST'])
+def add_donor():
+    data = request.json
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('INSERT INTO Donor (Name, Contact, Email) VALUES (%s, %s, %s)',
+                       (data['name'], data['contact'], data.get('email', '')))
+        conn.commit()
+        return jsonify({'success': True, 'id': cursor.lastrowid})
+    except Exception as e:
+        if conn: conn.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/donations', methods=['POST'])
+def record_donation():
+    data = request.json
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('INSERT INTO Donation (Donor_ID, Amount, Donation_Date) VALUES (%s, %s, %s)',
+                       (data['donor_id'], data['amount'], data['date']))
+        conn.commit()
+        return jsonify({'success': True, 'id': cursor.lastrowid})
+    except Exception as e:
+        if conn: conn.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/allocations', methods=['POST'])
+def add_allocation():
+    data = request.json
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('CALL AllocateResource(%s, %s, %s, %s)',
+                       (data['child_id'], data['resource_id'], data['qty'], data['staff_id']))
+        conn.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        if conn: conn.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/children/<int:id>', methods=['PUT', 'DELETE'])
+def manage_child(id):
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        if request.method == 'PUT':
+            data = request.json
+            cursor.execute('UPDATE Children SET Name=%s, DOB=%s, Gender=%s, Medical_Record=%s WHERE Child_ID=%s',
+                           (data['name'], data['dob'], data['gender'], data.get('medical', ''), id))
+            conn.commit()
+            return jsonify({'success': True})
+        elif request.method == 'DELETE':
+            cursor.execute('DELETE FROM Children WHERE Child_ID=%s', (id,))
+            conn.commit()
+            return jsonify({'success': True})
+    except Exception as e:
+        if conn: conn.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/resources/<int:id>', methods=['PUT', 'DELETE'])
+def manage_resource(id):
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        if request.method == 'PUT':
+            data = request.json
+            cursor.execute('UPDATE Resource SET Resource_Type=%s, Total_Quantity=%s WHERE Resource_ID=%s',
+                           (data['type'], data['qty'], id))
+            conn.commit()
+            return jsonify({'success': True})
+        elif request.method == 'DELETE':
+            cursor.execute('DELETE FROM Resource WHERE Resource_ID=%s', (id,))
+            conn.commit()
+            return jsonify({'success': True})
+    except Exception as e:
+        if conn: conn.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/staff/<int:id>', methods=['PUT', 'DELETE'])
+def manage_staff(id):
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        if request.method == 'PUT':
+            data = request.json
+            cursor.execute('UPDATE Staff SET Name=%s, Role=%s, Contact=%s WHERE Staff_ID=%s',
+                           (data['name'], data['role'], data['contact'], id))
+            conn.commit()
+            return jsonify({'success': True})
+        elif request.method == 'DELETE':
+            cursor.execute('DELETE FROM Staff WHERE Staff_ID=%s', (id,))
+            conn.commit()
+            return jsonify({'success': True})
+    except Exception as e:
+        if conn: conn.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/donors/<int:id>', methods=['PUT', 'DELETE'])
+def manage_donor(id):
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        if request.method == 'PUT':
+            data = request.json
+            cursor.execute('UPDATE Donor SET Name=%s, Contact=%s, Email=%s WHERE Donor_ID=%s',
+                           (data['name'], data['contact'], data.get('email', ''), id))
+            conn.commit()
+            return jsonify({'success': True})
+        elif request.method == 'DELETE':
+            cursor.execute('DELETE FROM Donor WHERE Donor_ID=%s', (id,))
+            conn.commit()
+            return jsonify({'success': True})
+    except Exception as e:
+        if conn: conn.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/allocations/<int:id>', methods=['PUT', 'DELETE'])
+def manage_allocation(id):
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        if request.method == 'PUT':
+            data = request.json
+            cursor.execute('UPDATE Allocation SET Child_ID=%s, Resource_ID=%s, Quantity=%s, Staff_ID=%s WHERE Allocation_ID=%s',
+                           (data['child_id'], data['resource_id'], data['qty'], data['staff_id'], id))
+            conn.commit()
+            return jsonify({'success': True})
+        elif request.method == 'DELETE':
+            cursor.execute('DELETE FROM Allocation WHERE Allocation_ID=%s', (id,))
+            conn.commit()
+            return jsonify({'success': True})
+    except Exception as e:
+        if conn: conn.rollback()
         return jsonify({'error': str(e)}), 500
     finally:
         if conn and conn.is_connected():
