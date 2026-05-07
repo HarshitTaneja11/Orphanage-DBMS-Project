@@ -329,3 +329,16 @@ ON UPDATE CASCADE;
 
 SHOW CREATE TABLE Donation;
 SHOW CREATE TABLE Allocation;
+
+CREATE USER 'harshit_admin'@'localhost' IDENTIFIED BY 'admin123';
+CREATE USER 'harshit_staff'@'localhost' IDENTIFIED BY 'staff123';
+CREATE USER 'harshit_auditor'@'localhost' IDENTIFIED BY 'audit123';
+
+GRANT admin_role TO 'harshit_admin'@'localhost';
+GRANT staff_role TO 'harshit_staff'@'localhost';
+GRANT auditor_role TO 'harshit_auditor'@'localhost';
+
+SET DEFAULT ROLE ALL TO
+'harshit_admin'@'localhost',
+'harshit_staff'@'localhost',
+'harshit_auditor'@'localhost';

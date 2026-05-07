@@ -2,6 +2,21 @@
 
 const API_BASE_URL = 'http://localhost:3000/api';
 
+if (!window.location.href.includes('login.html') && !localStorage.getItem('dbUser')) {
+    window.location.href = 'login.html';
+}
+
+async function apiFetch(url, options = {}) {
+    const dbUser = localStorage.getItem('dbUser');
+    const dbPass = localStorage.getItem('dbPass');
+    if (!options.headers) options.headers = {};
+    if (dbUser && dbPass) {
+        options.headers['X-DB-User'] = dbUser;
+        options.headers['X-DB-Password'] = dbPass;
+    }
+    return fetch(url, options);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // Loading Screen logic (2 seconds)
     setTimeout(() => {
@@ -23,6 +38,25 @@ document.addEventListener('DOMContentLoaded', () => {
     loadDonationsData();
     loadAllocationsData();
     initModals();
+    
+    // Logout and profile logic
+    const userProfile = document.querySelector('.user-profile');
+    if (userProfile) {
+        userProfile.title = "Click to Logout";
+        userProfile.style.cursor = "pointer";
+        const dbUser = localStorage.getItem('dbUser');
+        if (dbUser) {
+            const avatar = userProfile.querySelector('.avatar');
+            if (avatar) avatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(dbUser)}&background=6366f1&color=fff`;
+        }
+        userProfile.addEventListener('click', () => {
+            if(confirm('Are you sure you want to log out?')) {
+                localStorage.removeItem('dbUser');
+                localStorage.removeItem('dbPass');
+                window.location.href = 'login.html';
+            }
+        });
+    }
 });
 
 function initNavigation() {
@@ -50,7 +84,7 @@ function initNavigation() {
 async function loadDashboardData() {
     try {
         // Fetch Stats
-        const statsRes = await fetch(`${API_BASE_URL}/dashboard/stats`);
+        const statsRes = await apiFetch(`${API_BASE_URL}/dashboard/stats`);
         if(statsRes.ok) {
             const stats = await statsRes.json();
             
@@ -114,7 +148,7 @@ async function loadDashboardData() {
         }
 
         // Fetch Recent Donations
-        const donationsRes = await fetch(`${API_BASE_URL}/donations/recent`);
+        const donationsRes = await apiFetch(`${API_BASE_URL}/donations/recent`);
         if(donationsRes.ok) {
             const donations = await donationsRes.json();
             const donationsBody = document.getElementById('recent-donations-body');
@@ -131,7 +165,7 @@ async function loadDashboardData() {
         }
 
         // Fetch Low Resources Alert
-        const lowResRes = await fetch(`${API_BASE_URL}/resources/low`);
+        const lowResRes = await apiFetch(`${API_BASE_URL}/resources/low`);
         if(lowResRes.ok) {
             const lowResources = await lowResRes.json();
             const resourcesList = document.getElementById('low-resources-list');
@@ -159,7 +193,7 @@ async function loadDashboardData() {
 
 async function loadChildrenData() {
     try {
-        const res = await fetch(`${API_BASE_URL}/children`);
+        const res = await apiFetch(`${API_BASE_URL}/children`);
         if(res.ok) {
             const children = await res.json();
             const tbody = document.getElementById('children-body');
@@ -197,7 +231,7 @@ async function loadChildrenData() {
 
 async function loadResourcesData() {
     try {
-        const res = await fetch(`${API_BASE_URL}/resources`);
+        const res = await apiFetch(`${API_BASE_URL}/resources`);
         if(res.ok) {
             const resources = await res.json();
             const tbody = document.getElementById('resources-body');
@@ -233,7 +267,7 @@ async function loadResourcesData() {
 
 async function loadStaffData() {
     try {
-        const res = await fetch(`${API_BASE_URL}/staff`);
+        const res = await apiFetch(`${API_BASE_URL}/staff`);
         if(res.ok) {
             const staff = await res.json();
             const tbody = document.getElementById('staff-body');
@@ -270,7 +304,7 @@ async function loadStaffData() {
 
 async function loadDonorsData() {
     try {
-        const res = await fetch(`${API_BASE_URL}/donors`);
+        const res = await apiFetch(`${API_BASE_URL}/donors`);
         if(res.ok) {
             const donors = await res.json();
             const tbody = document.getElementById('donors-body');
@@ -302,7 +336,7 @@ async function loadDonorsData() {
 
 async function loadDonationsData() {
     try {
-        const res = await fetch(`${API_BASE_URL}/donations`);
+        const res = await apiFetch(`${API_BASE_URL}/donations`);
         if(res.ok) {
             const donations = await res.json();
             const tbody = document.getElementById('donations-body');
@@ -325,7 +359,7 @@ async function loadDonationsData() {
 
 async function loadAllocationsData() {
     try {
-        const res = await fetch(`${API_BASE_URL}/allocations`);
+        const res = await apiFetch(`${API_BASE_URL}/allocations`);
         if(res.ok) {
             const allocations = await res.json();
             const tbody = document.getElementById('allocations-body');
@@ -414,7 +448,7 @@ function setupFormSubmit(formId, endpoint, reloadCallback) {
         const url = isEdit ? `${API_BASE_URL}${endpoint}/${data.id}` : `${API_BASE_URL}${endpoint}`;
 
         try {
-            const response = await fetch(url, {
+            const response = await apiFetch(url, {
                 method: method,
                 headers: {
                     'Content-Type': 'application/json'
@@ -445,7 +479,7 @@ function setupFormSubmit(formId, endpoint, reloadCallback) {
 async function handleDelete(endpoint, id, reloadCallback) {
     if (!confirm('Are you sure you want to delete this record?')) return;
     try {
-        const res = await fetch(`${API_BASE_URL}${endpoint}/${id}`, { method: 'DELETE' });
+        const res = await apiFetch(`${API_BASE_URL}${endpoint}/${id}`, { method: 'DELETE' });
         if (res.ok) {
             reloadCallback();
             loadDashboardData();

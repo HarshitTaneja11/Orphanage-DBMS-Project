@@ -10,12 +10,36 @@ app = Flask(__name__)
 CORS(app)
 
 def get_db_connection():
+    db_user = request.headers.get('X-DB-User')
+    db_pass = request.headers.get('X-DB-Password')
+    if not db_user:
+        db_user = os.getenv('DB_USER', 'root')
+    if not db_pass:
+        db_pass = os.getenv('DB_PASSWORD', 'April@2005')
+        
     return mysql.connector.connect(
         host=os.getenv('DB_HOST', 'localhost'),
-        user=os.getenv('DB_USER', 'root'),
-        password=os.getenv('DB_PASSWORD', 'April@2005'),
+        user=db_user,
+        password=db_pass,
         database=os.getenv('DB_NAME', 'orphanage_db')
     )
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+    try:
+        conn = mysql.connector.connect(
+            host=os.getenv('DB_HOST', 'localhost'),
+            user=username,
+            password=password,
+            database=os.getenv('DB_NAME', 'orphanage_db')
+        )
+        conn.close()
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 401
 
 @app.route('/api/dashboard/stats', methods=['GET'])
 def get_stats():
@@ -216,7 +240,7 @@ def get_allocations():
             JOIN Children c ON a.Child_ID = c.Child_ID 
             JOIN Resource r ON a.Resource_ID = r.Resource_ID
             JOIN Staff s ON a.Staff_ID = s.Staff_ID
-            ORDER BY a.Allocation_Date DESC
+            ORDER BY a.Allocation_Date ASC
         """
         cursor.execute(query)
         rows = cursor.fetchall()
