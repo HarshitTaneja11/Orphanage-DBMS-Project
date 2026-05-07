@@ -296,6 +296,7 @@ body {
     gap: 20px;
     transition: transform 0.3s, box-shadow 0.3s;
     backdrop-filter: blur(16px);
+    cursor: pointer;
 }
 
 .stat-card:hover {

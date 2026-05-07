@@ -24,23 +24,48 @@ def get_stats():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         
+        # Children
         cursor.execute('SELECT COUNT(*) as count FROM Children')
-        children_count = cursor.fetchone()['count']
+        children_count = cursor.fetchone()['count'] or 0
         
+        # Donations
         cursor.execute('SELECT SUM(Amount) as total FROM Donation')
-        donations_total = cursor.fetchone()['total']
+        donations_total = float(cursor.fetchone()['total'] or 0)
         
+        cursor.execute('SELECT SUM(Amount) as total FROM Donation WHERE MONTH(Donation_Date) = MONTH(CURDATE()) AND YEAR(Donation_Date) = YEAR(CURDATE())')
+        donations_this_month = float(cursor.fetchone()['total'] or 0)
+        
+        cursor.execute('SELECT SUM(Amount) as total FROM Donation WHERE MONTH(Donation_Date) = MONTH(CURDATE() - INTERVAL 1 MONTH) AND YEAR(Donation_Date) = YEAR(CURDATE() - INTERVAL 1 MONTH)')
+        donations_last_month = float(cursor.fetchone()['total'] or 0)
+        
+        donation_trend = 0
+        if donations_last_month > 0:
+            donation_trend = ((donations_this_month - donations_last_month) / donations_last_month) * 100
+        elif donations_this_month > 0:
+            donation_trend = 100
+            
+        # Resources
         cursor.execute('SELECT SUM(Total_Quantity) as total FROM Resource')
-        resources_total = cursor.fetchone()['total']
+        resources_total = int(cursor.fetchone()['total'] or 0)
         
+        cursor.execute('SELECT SUM(Quantity) as total FROM Allocation WHERE YEARWEEK(Allocation_Date, 1) = YEARWEEK(CURDATE(), 1)')
+        resources_used_this_week = int(cursor.fetchone()['total'] or 0)
+        
+        # Allocations
         cursor.execute('SELECT COUNT(*) as count FROM Allocation WHERE Allocation_Date = CURDATE()')
-        allocations_today = cursor.fetchone()['count']
+        allocations_today = cursor.fetchone()['count'] or 0
+        
+        cursor.execute('SELECT COUNT(*) as count FROM Allocation WHERE Allocation_Date = CURDATE() - INTERVAL 1 DAY')
+        allocations_yesterday = cursor.fetchone()['count'] or 0
         
         return jsonify({
-            'totalChildren': children_count or 0,
-            'totalDonations': float(donations_total or 0),
-            'resourcesAvailable': int(resources_total or 0),
-            'allocationsToday': allocations_today or 0
+            'totalChildren': children_count,
+            'totalDonations': donations_total,
+            'donationTrend': round(donation_trend, 1),
+            'resourcesAvailable': resources_total,
+            'resourcesUsedThisWeek': resources_used_this_week,
+            'allocationsToday': allocations_today,
+            'allocationsYesterday': allocations_yesterday
         })
     except Exception as e:
         print("Error fetching stats:", e)

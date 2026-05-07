@@ -53,14 +53,63 @@ async function loadDashboardData() {
         const statsRes = await fetch(`${API_BASE_URL}/dashboard/stats`);
         if(statsRes.ok) {
             const stats = await statsRes.json();
-            // Update UI manually based on the fetched stats
-            // We select by nth-child to match our HTML structure
-            const statValues = document.querySelectorAll('.stat-value');
-            if(statValues.length >= 4) {
-                statValues[0].textContent = stats.totalChildren;
-                statValues[1].textContent = `₹${parseFloat(stats.totalDonations).toLocaleString('en-IN')}`;
-                statValues[2].textContent = stats.resourcesAvailable;
-                statValues[3].textContent = stats.allocationsToday;
+            
+            // Total Children
+            const childrenValue = document.getElementById('total-children-value');
+            const childrenTrend = document.getElementById('total-children-trend');
+            if (childrenValue) childrenValue.textContent = stats.totalChildren;
+            if (childrenTrend) {
+                childrenTrend.className = 'stat-trend neutral';
+                childrenTrend.innerHTML = '<i class="fa-solid fa-users"></i> Total Enrolled';
+            }
+            
+            // Total Donations
+            const donationsValue = document.getElementById('total-donations-value');
+            const donationsTrend = document.getElementById('total-donations-trend');
+            if (donationsValue) donationsValue.textContent = `₹${parseFloat(stats.totalDonations).toLocaleString('en-IN')}`;
+            if (donationsTrend) {
+                if (stats.donationTrend > 0) {
+                    donationsTrend.className = 'stat-trend positive';
+                    donationsTrend.innerHTML = `<i class="fa-solid fa-arrow-trend-up"></i> +${stats.donationTrend}% vs last month`;
+                } else if (stats.donationTrend < 0) {
+                    donationsTrend.className = 'stat-trend negative';
+                    donationsTrend.innerHTML = `<i class="fa-solid fa-arrow-trend-down"></i> ${stats.donationTrend}% vs last month`;
+                } else {
+                    donationsTrend.className = 'stat-trend neutral';
+                    donationsTrend.innerHTML = '<i class="fa-solid fa-minus"></i> No change vs last month';
+                }
+            }
+            
+            // Resources Available
+            const resourcesValue = document.getElementById('resources-available-value');
+            const resourcesTrend = document.getElementById('resources-available-trend');
+            if (resourcesValue) resourcesValue.textContent = stats.resourcesAvailable;
+            if (resourcesTrend) {
+                if (stats.resourcesUsedThisWeek > 0) {
+                    resourcesTrend.className = 'stat-trend negative';
+                    resourcesTrend.innerHTML = `<i class="fa-solid fa-arrow-trend-down"></i> -${stats.resourcesUsedThisWeek} this week`;
+                } else {
+                    resourcesTrend.className = 'stat-trend neutral';
+                    resourcesTrend.innerHTML = '<i class="fa-solid fa-minus"></i> None used this week';
+                }
+            }
+            
+            // Allocations Today
+            const allocationsValue = document.getElementById('allocations-today-value');
+            const allocationsTrend = document.getElementById('allocations-today-trend');
+            if (allocationsValue) allocationsValue.textContent = stats.allocationsToday;
+            if (allocationsTrend) {
+                const diff = stats.allocationsToday - stats.allocationsYesterday;
+                if (diff > 0) {
+                    allocationsTrend.className = 'stat-trend positive';
+                    allocationsTrend.innerHTML = `<i class="fa-solid fa-arrow-trend-up"></i> +${diff} from yesterday`;
+                } else if (diff < 0) {
+                    allocationsTrend.className = 'stat-trend negative';
+                    allocationsTrend.innerHTML = `<i class="fa-solid fa-arrow-trend-down"></i> ${diff} from yesterday`;
+                } else {
+                    allocationsTrend.className = 'stat-trend neutral';
+                    allocationsTrend.innerHTML = '<i class="fa-solid fa-minus"></i> Same as yesterday';
+                }
             }
         }
 
